@@ -12,14 +12,14 @@ type ProtocGenGraphqlTestBasic_FooService_Query {
 type ProtocGenGraphqlTestBasic_ScalarFields {
   string_field: String!
   bytes_field: String!
-  int32_field: Float!
-  uint32_field: Float!
-  sint32_field: Float!
-  fixed32_field: Float!
-  int64_field: Float!
-  uint64_field: Float!
-  sint64_field: Float!
-  fixed64_field: Float!
+  int32_field: Int!
+  uint32_field: Int!
+  sint32_field: Int!
+  fixed32_field: Int!
+  int64_field: Int!
+  uint64_field: Int!
+  sint64_field: Int!
+  fixed64_field: Int!
   float_field: Float!
   double_field: Float!
   bool_field: Boolean!
@@ -28,14 +28,14 @@ type ProtocGenGraphqlTestBasic_ScalarFields {
 input ProtocGenGraphqlTestBasic_ScalarFieldsInput {
   string_field: String
   bytes_field: String
-  int32_field: Float
-  uint32_field: Float
-  sint32_field: Float
-  fixed32_field: Float
-  int64_field: Float
-  uint64_field: Float
-  sint64_field: Float
-  fixed64_field: Float
+  int32_field: Int
+  uint32_field: Int
+  sint32_field: Int
+  fixed32_field: Int
+  int64_field: Int
+  uint64_field: Int
+  sint64_field: Int
+  fixed64_field: Int
   float_field: Float
   double_field: Float
   bool_field: Boolean

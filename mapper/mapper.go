@@ -2,9 +2,11 @@ package mapper
 
 import (
 	"fmt"
-	"github.com/martinxsliu/protoc-gen-graphql/parameters"
+	"log"
 	"os"
 	"strings"
+
+	"github.com/martinxsliu/protoc-gen-graphql/parameters"
 
 	"google.golang.org/protobuf/types/descriptorpb"
 
@@ -355,23 +357,32 @@ func (m *Mapper) graphqlField(f *descriptor.Field, input bool) *graphql.Field {
 			field.Modifiers = graphql.TypeModifierNonNull
 		}
 
-	case descriptorpb.FieldDescriptorProto_TYPE_FLOAT, descriptorpb.FieldDescriptorProto_TYPE_DOUBLE,
-		descriptorpb.FieldDescriptorProto_TYPE_INT32, descriptorpb.FieldDescriptorProto_TYPE_UINT32, descriptorpb.FieldDescriptorProto_TYPE_SINT32,
-		descriptorpb.FieldDescriptorProto_TYPE_FIXED32, descriptorpb.FieldDescriptorProto_TYPE_SFIXED32:
+	case descriptorpb.FieldDescriptorProto_TYPE_INT64, descriptorpb.FieldDescriptorProto_TYPE_UINT64, descriptorpb.FieldDescriptorProto_TYPE_SINT64,
+		descriptorpb.FieldDescriptorProto_TYPE_FIXED64, descriptorpb.FieldDescriptorProto_TYPE_SFIXED64,
+		descriptorpb.FieldDescriptorProto_TYPE_UINT32:
+		// GraphQL Scalar type limitations https://graphql.org/learn/schema/
+		log.Printf(
+			"WARNING: Field %s (%s) of type %s has been converted to Int (32-bit) due to GraphQL scalar types limitations (https://graphql.org/learn/schema).\n",
+			f.Name,
+			f.Parent.Package,
+			proto.GetType().String(),
+		)
+		fallthrough
 
-		field.TypeName = graphql.ScalarFloat.TypeName()
+	case descriptorpb.FieldDescriptorProto_TYPE_INT32, descriptorpb.FieldDescriptorProto_TYPE_SINT32,
+		descriptorpb.FieldDescriptorProto_TYPE_FIXED32, descriptorpb.FieldDescriptorProto_TYPE_SFIXED32:
+		if m.Params.JS64BitType == parameters.JS64BitTypeString {
+			field.TypeName = graphql.ScalarString.TypeName()
+		} else {
+			field.TypeName = graphql.ScalarInt.TypeName()
+		}
 		if !nullableScalars {
 			field.Modifiers = graphql.TypeModifierNonNull
 		}
 
-	case descriptorpb.FieldDescriptorProto_TYPE_INT64, descriptorpb.FieldDescriptorProto_TYPE_UINT64, descriptorpb.FieldDescriptorProto_TYPE_SINT64,
-		descriptorpb.FieldDescriptorProto_TYPE_FIXED64, descriptorpb.FieldDescriptorProto_TYPE_SFIXED64:
+	case descriptorpb.FieldDescriptorProto_TYPE_FLOAT, descriptorpb.FieldDescriptorProto_TYPE_DOUBLE:
 
-		if m.Params.JS64BitType == parameters.JS64BitTypeString {
-			field.TypeName = graphql.ScalarString.TypeName()
-		} else {
-			field.TypeName = graphql.ScalarFloat.TypeName()
-		}
+		field.TypeName = graphql.ScalarFloat.TypeName()
 		if !nullableScalars {
 			field.Modifiers = graphql.TypeModifierNonNull
 		}
