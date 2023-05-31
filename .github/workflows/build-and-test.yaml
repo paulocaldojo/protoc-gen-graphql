@@ -1,0 +1,17 @@
+name: "Build and test"
+
+on:
+  push:
+    branches:
+      - "**"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v2
+      - name: Build and Test
+        run: |
+          make test
