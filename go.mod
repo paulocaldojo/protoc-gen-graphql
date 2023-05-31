@@ -1,6 +1,6 @@
 module github.com/martinxsliu/protoc-gen-graphql
 
-go 1.15
+go 1.20
 
 require (
 	github.com/golang/protobuf v1.4.1
