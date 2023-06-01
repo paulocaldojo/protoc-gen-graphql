@@ -6,12 +6,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/martinxsliu/protoc-gen-graphql/parameters"
+	"github.com/paulocaldojo/protoc-gen-graphql/parameters"
 
 	"google.golang.org/protobuf/types/descriptorpb"
 
-	"github.com/martinxsliu/protoc-gen-graphql/descriptor"
-	"github.com/martinxsliu/protoc-gen-graphql/graphql"
+	"github.com/paulocaldojo/protoc-gen-graphql/descriptor"
+	"github.com/paulocaldojo/protoc-gen-graphql/graphql"
 )
 
 type Mapper struct {

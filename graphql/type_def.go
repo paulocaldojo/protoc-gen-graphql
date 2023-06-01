@@ -1,8 +1,9 @@
 package graphql
 
 import (
-	"github.com/martinxsliu/protoc-gen-graphql/parameters"
 	"strings"
+
+	"github.com/paulocaldojo/protoc-gen-graphql/parameters"
 )
 
 // TypeDef returns the schema definition language (SDL) representation

@@ -1,4 +1,4 @@
-module github.com/martinxsliu/protoc-gen-graphql
+module github.com/paulocaldojo/protoc-gen-graphql
 
 go 1.20
 
