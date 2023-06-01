@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package protoc_gen_graphql.test.basic;
 
+option go_package = "github.com/paulocaldojo/protoc-gen-graphql/testdata/field_name_preserve";
+
 import "graphql/options.proto";
 
 service FooService {

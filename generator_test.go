@@ -92,3 +92,7 @@ func TestEmptyProto(t *testing.T) {
 func TestNullableListTypes(t *testing.T) {
 	itGeneratesTheCorrectOutput(t, "nullable_list_types", "nullable_list_types")
 }
+
+func TestOptionalFields(t *testing.T) {
+	itGeneratesTheCorrectOutput(t, "optional", "")
+}

@@ -63,6 +63,8 @@ type Oneof struct {
 	Proto  *descriptorpb.OneofDescriptorProto
 	Parent *Message
 	Fields []*Field
+	// More information: https://github.com/protocolbuffers/protobuf/blob/main/docs/implementing_proto3_presence.md
+	IsOptionalProto3 bool
 }
 
 type Enum struct {
@@ -197,7 +199,9 @@ func wrapFields(parent *Message) {
 	seenOneofs := make(map[int32]bool)
 	for _, fieldProto := range parent.Proto.GetField() {
 		// Handle normal field.
-		if fieldProto.OneofIndex == nil {
+		// Handles proto3 optional fields considered proto oneof fields (more information:
+		// https://github.com/protocolbuffers/protobuf/blob/main/docs/implementing_proto3_presence.md)
+		if fieldProto.OneofIndex == nil || fieldProto.Proto3Optional != nil && *fieldProto.Proto3Optional {
 			options := getFieldOptions(fieldProto)
 			parent.Fields = append(parent.Fields, &Field{
 				Name:       fieldProto.GetName(),
@@ -238,6 +242,7 @@ func wrapOneofs(parent *Message) {
 	for _, fieldProto := range parent.Proto.GetField() {
 		if fieldProto.OneofIndex != nil {
 			index := *fieldProto.OneofIndex
+			parent.Oneofs[index].IsOptionalProto3 = fieldProto.Proto3Optional != nil && *fieldProto.Proto3Optional
 			parent.Oneofs[index].Fields = append(parent.Oneofs[index].Fields, &Field{
 				Name:    fieldProto.GetName(),
 				Proto:   fieldProto,

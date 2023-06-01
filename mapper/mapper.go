@@ -261,6 +261,12 @@ func (m *Mapper) buildMessageMapper(message *descriptor.Message, input bool) {
 
 	var oneofMappers []*OneofMapper
 	for _, oneof := range message.Oneofs {
+		// Skip proto3 optional messages considered oneof messages
+		// More information: https://github.com/protocolbuffers/protobuf/blob/main/docs/implementing_proto3_presence.md
+		if oneof.IsOptionalProto3 {
+			continue
+		}
+
 		oneofMappers = append(oneofMappers, m.buildOneofMapper(oneof, input))
 	}
 	mapper.Oneofs = oneofMappers
@@ -348,14 +354,14 @@ func (m *Mapper) graphqlField(f *descriptor.Field, input bool) *graphql.Field {
 	}
 
 	proto := f.Proto
-	nullableScalars := m.nullableScalars(f, input)
+
+	if !m.isNullableField(f, input) {
+		field.Modifiers = graphql.TypeModifierNonNull
+	}
 
 	switch proto.GetType() {
 	case descriptorpb.FieldDescriptorProto_TYPE_STRING, descriptorpb.FieldDescriptorProto_TYPE_BYTES:
 		field.TypeName = graphql.ScalarString.TypeName()
-		if !nullableScalars {
-			field.Modifiers = graphql.TypeModifierNonNull
-		}
 
 	case descriptorpb.FieldDescriptorProto_TYPE_INT64, descriptorpb.FieldDescriptorProto_TYPE_UINT64, descriptorpb.FieldDescriptorProto_TYPE_SINT64,
 		descriptorpb.FieldDescriptorProto_TYPE_FIXED64, descriptorpb.FieldDescriptorProto_TYPE_SFIXED64,
@@ -376,28 +382,16 @@ func (m *Mapper) graphqlField(f *descriptor.Field, input bool) *graphql.Field {
 		} else {
 			field.TypeName = graphql.ScalarInt.TypeName()
 		}
-		if !nullableScalars {
-			field.Modifiers = graphql.TypeModifierNonNull
-		}
 
 	case descriptorpb.FieldDescriptorProto_TYPE_FLOAT, descriptorpb.FieldDescriptorProto_TYPE_DOUBLE:
 
 		field.TypeName = graphql.ScalarFloat.TypeName()
-		if !nullableScalars {
-			field.Modifiers = graphql.TypeModifierNonNull
-		}
 
 	case descriptorpb.FieldDescriptorProto_TYPE_BOOL:
 		field.TypeName = graphql.ScalarBoolean.TypeName()
-		if !nullableScalars {
-			field.Modifiers = graphql.TypeModifierNonNull
-		}
 
 	case descriptorpb.FieldDescriptorProto_TYPE_ENUM:
 		field.TypeName = m.EnumMappers[proto.GetTypeName()].Enum.Name
-		if !nullableScalars {
-			field.Modifiers = graphql.TypeModifierNonNull
-		}
 
 	case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
 		if input {
@@ -408,7 +402,7 @@ func (m *Mapper) graphqlField(f *descriptor.Field, input bool) *graphql.Field {
 
 		// IsProtoMap elements are non-nullable.
 		if m.Messages[proto.GetTypeName()].IsMap {
-			field.Modifiers = graphql.TypeModifierNonNull
+			field.Modifiers = field.Modifiers | graphql.TypeModifierNonNull
 		}
 
 	default:
@@ -777,13 +771,15 @@ func (m *Mapper) enumName(enum *descriptor.Enum) string {
 	})
 }
 
-func (m *Mapper) nullableScalars(field *descriptor.Field, input bool) bool {
+func (m *Mapper) isNullableField(field *descriptor.Field, input bool) bool {
 	if input {
 		return true
 	}
 	switch field.Parent.File.Proto.GetSyntax() {
 	case "proto2", "":
 		return field.Proto.GetLabel() == descriptorpb.FieldDescriptorProto_LABEL_OPTIONAL
+	case "proto3":
+		return field.Proto.Proto3Optional != nil && *field.Proto.Proto3Optional
 	}
 	return false
 }

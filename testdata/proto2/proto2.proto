@@ -2,6 +2,8 @@ syntax = "proto2";
 
 package protoc_gen_graphql.test.proto2;
 
+option go_package = "github.com/paulocaldojo/protoc-gen-graphql/testdata/proto2";
+
 message Test {
   optional string optional_field = 1;
   required string required_field = 2;

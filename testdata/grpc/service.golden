@@ -20,7 +20,7 @@ type ProtocGenGraphqlTestGrpc_Service_Query {
 
 type ProtocGenGraphqlTestGrpc_Request {
   stringField: String!
-  foo: ProtocGenGraphqlTestGrpc_Request_Foo
+  foo: ProtocGenGraphqlTestGrpc_Request_Foo!
   bar: [ProtocGenGraphqlTestGrpc_Request_Foo_Bar!]!
   mapField: [ProtocGenGraphqlTestGrpc_Request_MapFieldEntry!]!
   oneofField: ProtocGenGraphqlTestGrpc_Request_OneofFieldOneof
@@ -45,7 +45,7 @@ type ProtocGenGraphqlTestGrpc_Request_OneofFieldOneof_First {
 """
 type ProtocGenGraphqlTestGrpc_Request_OneofFieldOneof_Second {
   _typename: String
-  second: ProtocGenGraphqlTestGrpc_Request_Foo
+  second: ProtocGenGraphqlTestGrpc_Request_Foo!
 }
 
 input ProtocGenGraphqlTestGrpc_RequestInput {

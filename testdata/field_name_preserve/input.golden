@@ -42,13 +42,13 @@ input ProtocGenGraphqlTestBasic_ScalarFieldsInput {
 }
 
 type ProtocGenGraphqlTestBasic_ComplexFields {
-  message_field: ProtocGenGraphqlTestBasic_ScalarFields
+  message_field: ProtocGenGraphqlTestBasic_ScalarFields!
   enum_field: ProtocGenGraphqlTestBasic_EnumType!
   repeated_scalar_field: [String!]!
   repeated_message_field: [ProtocGenGraphqlTestBasic_ScalarFields!]!
   map_field: [ProtocGenGraphqlTestBasic_ComplexFields_MapFieldEntry!]!
   oneof_field: ProtocGenGraphqlTestBasic_ComplexFields_OneofFieldOneof
-  empty_field: ProtocGenGraphqlTestBasic_Empty
+  empty_field: ProtocGenGraphqlTestBasic_Empty!
 }
 
 """
@@ -69,7 +69,7 @@ type ProtocGenGraphqlTestBasic_ComplexFields_OneofFieldOneof_First {
 """
 type ProtocGenGraphqlTestBasic_ComplexFields_OneofFieldOneof_Second {
   _typename: String
-  second: ProtocGenGraphqlTestBasic_ScalarFields
+  second: ProtocGenGraphqlTestBasic_ScalarFields!
 }
 
 """
@@ -81,8 +81,8 @@ type ProtocGenGraphqlTestBasic_ComplexFields_MapFieldEntry {
 }
 
 type ProtocGenGraphqlTestBasic_Outer {
-  middle: ProtocGenGraphqlTestBasic_Outer_Middle
-  inner: ProtocGenGraphqlTestBasic_Outer_Middle_Inner
+  middle: ProtocGenGraphqlTestBasic_Outer_Middle!
+  inner: ProtocGenGraphqlTestBasic_Outer_Middle_Inner!
 }
 
 type ProtocGenGraphqlTestBasic_Outer_Middle {

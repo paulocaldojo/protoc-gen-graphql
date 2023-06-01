@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/martinxsliu/protoc-gen-graphql/parameters"
 	"strings"
+
+	"github.com/martinxsliu/protoc-gen-graphql/parameters"
 
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/types/pluginpb"

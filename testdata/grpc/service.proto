@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package protoc_gen_graphql.test.grpc;
 
+option go_package = "github.com/paulocaldojo/protoc-gen-graphql/testdata/grpc";
+
 import "graphql/options.proto";
 import "grpc/data.proto";
 
