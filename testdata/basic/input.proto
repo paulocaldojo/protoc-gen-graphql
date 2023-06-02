@@ -134,4 +134,7 @@ message Comment {
     // This is a leading comment attached to the first oneof value.
     string first = 5;
   }
+
+  // This is a optional field comment.
+  optional string opt = 6;
 }

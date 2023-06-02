@@ -124,6 +124,10 @@ type ProtocGenGraphqlTestBasic_Comment {
   This is a leading comment attached to the oneof.
   """
   oneof: ProtocGenGraphqlTestBasic_Comment_OneofOneof
+  """
+  This is a optional field comment.
+  """
+  opt: String
 }
 
 """

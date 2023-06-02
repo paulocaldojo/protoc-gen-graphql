@@ -44,13 +44,14 @@ type Message struct {
 type Field struct {
 	Name string
 	// nil if IsProtoOneof is true.
-	Proto      *descriptorpb.FieldDescriptorProto
-	Options    *graphqlpb.FieldOptions
-	Parent     *Message
-	IsOneof    bool
-	OneofIndex int32
-	ForeignKey *ForeignKey
-	Comments   string
+	Proto            *descriptorpb.FieldDescriptorProto
+	Options          *graphqlpb.FieldOptions
+	Parent           *Message
+	IsOneof          bool
+	OneofIndex       int32
+	IsProto3Optional bool
+	ForeignKey       *ForeignKey
+	Comments         string
 }
 
 type ForeignKey struct {
@@ -60,10 +61,9 @@ type ForeignKey struct {
 }
 
 type Oneof struct {
-	Proto  *descriptorpb.OneofDescriptorProto
-	Parent *Message
-	Fields []*Field
-	// More information: https://github.com/protocolbuffers/protobuf/blob/main/docs/implementing_proto3_presence.md
+	Proto            *descriptorpb.OneofDescriptorProto
+	Parent           *Message
+	Fields           []*Field
 	IsOptionalProto3 bool
 }
 
@@ -198,11 +198,10 @@ func wrapMessage(file *File, proto *descriptorpb.DescriptorProto, parent *Messag
 func wrapFields(parent *Message) {
 	seenOneofs := make(map[int32]bool)
 	for _, fieldProto := range parent.Proto.GetField() {
+		options := getFieldOptions(fieldProto)
+
 		// Handle normal field.
-		// Handles proto3 optional fields considered proto oneof fields (more information:
-		// https://github.com/protocolbuffers/protobuf/blob/main/docs/implementing_proto3_presence.md)
-		if fieldProto.OneofIndex == nil || fieldProto.Proto3Optional != nil && *fieldProto.Proto3Optional {
-			options := getFieldOptions(fieldProto)
+		if fieldProto.OneofIndex == nil {
 			parent.Fields = append(parent.Fields, &Field{
 				Name:       fieldProto.GetName(),
 				Proto:      fieldProto,
@@ -224,9 +223,14 @@ func wrapFields(parent *Message) {
 		name := parent.Proto.GetOneofDecl()[index].GetName()
 		parent.Fields = append(parent.Fields, &Field{
 			Name:       name,
+			Proto:      fieldProto,
+			Options:    options,
 			Parent:     parent,
-			IsOneof:    true,
-			OneofIndex: index,
+			ForeignKey: getForeignKeyOption(options.GetForeignKey()),
+
+			IsOneof:          true,
+			OneofIndex:       index,
+			IsProto3Optional: fieldProto.Proto3Optional != nil && *fieldProto.Proto3Optional,
 		})
 	}
 }
@@ -244,10 +248,11 @@ func wrapOneofs(parent *Message) {
 			index := *fieldProto.OneofIndex
 			parent.Oneofs[index].IsOptionalProto3 = fieldProto.Proto3Optional != nil && *fieldProto.Proto3Optional
 			parent.Oneofs[index].Fields = append(parent.Oneofs[index].Fields, &Field{
-				Name:    fieldProto.GetName(),
-				Proto:   fieldProto,
-				Options: getFieldOptions(fieldProto),
-				Parent:  parent,
+				Name:             fieldProto.GetName(),
+				Proto:            fieldProto,
+				Options:          getFieldOptions(fieldProto),
+				Parent:           parent,
+				IsProto3Optional: fieldProto.Proto3Optional != nil && *fieldProto.Proto3Optional,
 			})
 		}
 	}
@@ -354,7 +359,7 @@ func setMessageComments(file *File, proto *descriptorpb.DescriptorProto, locatio
 		fieldProto := message.Proto.Field[relativePath[1]]
 
 		fields := message.Fields
-		if fieldProto.OneofIndex != nil {
+		if fieldProto.OneofIndex != nil && (fieldProto.Proto3Optional == nil || !*fieldProto.Proto3Optional) {
 			oneof := message.Oneofs[fieldProto.GetOneofIndex()]
 			fields = oneof.Fields
 		}

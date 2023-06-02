@@ -294,7 +294,7 @@ func (m *Mapper) graphqlFields(message *descriptor.Message, input bool) []*graph
 			continue
 		}
 
-		if field.IsOneof {
+		if field.IsOneof && !field.IsProto3Optional {
 			oneofObjectName := field.Name + "Oneof"
 			fields = append(fields, &graphql.Field{
 				Name:        m.fieldName(field),
