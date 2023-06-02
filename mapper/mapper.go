@@ -368,9 +368,9 @@ func (m *Mapper) graphqlField(f *descriptor.Field, input bool) *graphql.Field {
 		descriptorpb.FieldDescriptorProto_TYPE_UINT32:
 		// GraphQL Scalar type limitations https://graphql.org/learn/schema/
 		log.Printf(
-			"WARNING: Field %s (%s) of type %s has been converted to Int (32-bit) due to GraphQL scalar types limitations (https://graphql.org/learn/schema).\n",
+			"WARNING: Field %s.%s of type %s has been converted to Int (32-bit) due to GraphQL scalar types limitations (https://graphql.org/learn/schema).\n",
+			f.Parent.FullName,
 			f.Name,
-			f.Parent.Package,
 			proto.GetType().String(),
 		)
 		fallthrough
